@@ -1,4 +1,4 @@
-# Invutory
+# Stockory
 
 Offline stock and sales register for small shops — items, stock in/out, low-stock alerts, bilingual (English/Urdu) receipts, day book and reports. No account, no subscription, no internet.
 
@@ -16,7 +16,7 @@ Offline stock and sales register for small shops — items, stock in/out, low-st
 
 ## Data safety
 
-- `invutory.db` — SQLCipher-encrypted SQLite (WAL, foreign keys), key wrapped by OS DPAPI/Keychain
+- `stockory.db` — SQLCipher-encrypted SQLite (WAL, foreign keys), key wrapped by OS DPAPI/Keychain
 - Strict CSP, `connect-src 'none'` in packaged builds — the renderer cannot reach the network
 - LAN sharing is opt-in, off by default, access-code protected, local-network only
 
@@ -29,4 +29,4 @@ npm run build      # renderer bundle → dist/
 npm run dist:win   # Windows NSIS + APPX → release/ (Windows only)
 ```
 
-Windows package metadata (appId `com.shahbaz.invutory`, appx identity) lives in `package.json` → `build`. `identityName` / `publisher` must be pasted from Partner Center → Product Identity before the Store package is built. Tile assets for the appx live in `build/appx/`.
+Windows package metadata (appId `com.shahbaz.stockory`, appx identity) lives in `package.json` → `build`. `identityName` / `publisher` must be pasted from Partner Center → Product Identity before the Store package is built. Tile assets for the appx live in `build/appx/`.

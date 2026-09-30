@@ -6,7 +6,7 @@ const { readJsonEnc, writeJsonEnc, verifyPinStr } = require('./doc-io.cjs');
 const { serveDoc, mergeSave, loadDoc } = require('../db.cjs');
 
 /**
- * Document store: the live data lives in invutory.db (SQLCipher-encrypted
+ * Document store: the live data lives in stockory.db (SQLCipher-encrypted
  * SQLite, WAL) — see ../db.cjs. Writes merge at ROW level via rev baselines,
  * so two PCs editing different records don't clobber each other. Timestamped
  * snapshots in history/ stay as encrypted JSON so a bad state can be rolled
@@ -19,7 +19,7 @@ function storeDir() {
 }
 
 function docPath() {
-  return path.join(storeDir(), 'invutory.json');
+  return path.join(storeDir(), 'stockory.json');
 }
 
 function historyDir() {
@@ -99,7 +99,7 @@ function maybeAutoBackup() {
     const today = new Date().toISOString().slice(0, 10);
     if (!st.backupFolder || st.lastBackupAt === today) return;
     fs.mkdirSync(st.backupFolder, { recursive: true });
-    writeJsonEnc(path.join(st.backupFolder, `invutory-backup-${today}.json`), doc);
+    writeJsonEnc(path.join(st.backupFolder, `stockory-backup-${today}.json`), doc);
     mergeSave({ ...doc, settings: { ...st, lastBackupAt: today } }, { actor: 'auto-backup' });
   } catch { /* backup is best-effort — surface via the stale-banner instead */ }
 }

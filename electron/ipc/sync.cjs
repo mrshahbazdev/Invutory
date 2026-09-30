@@ -41,7 +41,7 @@ function registerSyncIPC() {
   // Serve the latest store to peers on the LAN.
   const server = http.createServer((req, res) => {
     const u = new URL(req.url || '/', 'http://x');
-    const tok = req.headers['x-invutory-token'] || req.headers['x-invutory-token'] || '';
+    const tok = req.headers['x-stockory-token'] || req.headers['x-stockory-token'] || '';
     if (u.pathname === '/store' && codeOk(tok)) {
       let doc = latestDoc;
       try { doc = require('../db.cjs').loadDoc() || doc; } catch {}
@@ -62,19 +62,19 @@ function registerSyncIPC() {
   sock.bind(BEACON_PORT);
   setInterval(() => {
     try {
-      sock.send(JSON.stringify({ app: 'invutory', clientId, port: SYNC_PORT, updatedAt: latestAt }), BEACON_PORT, '255.255.255.255');
+      sock.send(JSON.stringify({ app: 'stockory', clientId, port: SYNC_PORT, updatedAt: latestAt }), BEACON_PORT, '255.255.255.255');
     } catch { /* offline interface */ }
   }, BEACON_EVERY);
 
   sock.on('message', (buf, rinfo) => {
     try {
       const msg = JSON.parse(buf.toString());
-      if (!msg || (msg.app !== 'invutory') || msg.clientId === clientId) return;
+      if (!msg || (msg.app !== 'stockory') || msg.clientId === clientId) return;
       const remoteAt = msg.updatedAt || 0;
       if (remoteAt <= latestAt || inflight.has(rinfo.address)) return;
       inflight.add(rinfo.address);
       http.get({ host: rinfo.address, port: msg.port || SYNC_PORT, path: '/store', timeout: 4000,
-        headers: { 'x-invutory-token': pairCode || lanCode() } }, res => {
+        headers: { 'x-stockory-token': pairCode || lanCode() } }, res => {
         let body = '';
         res.on('data', c => body += c);
         res.on('end', () => {
@@ -83,7 +83,7 @@ function registerSyncIPC() {
             const doc = JSON.parse(body);
             if (doc && Array.isArray(doc.items) && (doc.updatedAt || 0) > latestAt) {
               const w = BrowserWindow.getAllWindows()[0];
-              if (w) w.webContents.send('invutory:sync-apply', doc);
+              if (w) w.webContents.send('stockory:sync-apply', doc);
             }
           } catch { /* malformed payload */ }
         });

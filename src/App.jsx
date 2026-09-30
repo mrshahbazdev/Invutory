@@ -73,7 +73,7 @@ export default function App() {
       window.api.store.save(store);
       if (store.settings.syncFolder) {
         const text = JSON.stringify(store);
-        window.api.export.toFolder({ folder: store.settings.syncFolder, name: 'invutory-sync.json', text });
+        window.api.export.toFolder({ folder: store.settings.syncFolder, name: 'stockory-sync.json', text });
         syncText.current = text;
       }
       if (store.settings.syncAuto !== false) window.api.sync.publish(store);
@@ -81,7 +81,7 @@ export default function App() {
     return () => clearTimeout(saveTimer.current);
   }, [store]);
 
-  // LAN sync: adopt a newer store pushed by another Invutory on the network.
+  // LAN sync: adopt a newer store pushed by another Stockory on the network.
   useEffect(() => {
     if (!window.api.sync?.onApply) return;
     window.api.sync.onApply(doc => {
@@ -100,7 +100,7 @@ export default function App() {
     const t = setInterval(async () => {
       const folder = store?.settings?.syncFolder;
       if (!folder || store?.settings?.syncAuto === false) return;
-      const res = await window.api.export.readFromFolder({ folder, name: 'invutory-sync.json' }).catch(() => null);
+      const res = await window.api.export.readFromFolder({ folder, name: 'stockory-sync.json' }).catch(() => null);
       if (!res?.ok || !res.text) return;
       if (res.text === syncText.current || res.text === JSON.stringify(store)) return;
       try {
@@ -129,18 +129,18 @@ export default function App() {
 
   const exportAllJson = () => {
     const json = JSON.stringify(store, null, 2);
-    window.api.export.json({ json, suggestedName: 'invutory-backup.json' });
+    window.api.export.json({ json, suggestedName: 'stockory-backup.json' });
     if (store.settings.backupFolder)
-      window.api.export.toFolder({ folder: store.settings.backupFolder, name: `invutory-backup-${new Date().toISOString().slice(0, 10)}.json`, text: json });
+      window.api.export.toFolder({ folder: store.settings.backupFolder, name: `stockory-backup-${new Date().toISOString().slice(0, 10)}.json`, text: json });
     update(s => s.settings.lastBackupAt = new Date().toISOString().slice(0, 10));
   };
-  const exportItemsCsv = () => window.api.export.text({ text: itemsCsv(store), suggestedName: 'invutory-items.csv' });
+  const exportItemsCsv = () => window.api.export.text({ text: itemsCsv(store), suggestedName: 'stockory-items.csv' });
   const importJson = async () => {
     const f = await window.api.app.openFile({ filters: [{ name: 'JSON', extensions: ['json'] }] });
     if (!f?.text) return;
     try {
       const parsed = JSON.parse(f.text);
-      if (!parsed.items) throw new Error('not an Invutory backup');
+      if (!parsed.items) throw new Error('not an Stockory backup');
       await window.api.store.snapshot(store, 'before import');
       setStore({ ...emptyStore(), ...parsed });
     } catch (e) { alert('Could not import: ' + e.message); }
@@ -161,7 +161,7 @@ export default function App() {
   return (
     <div className="app" dir={ur ? 'rtl' : 'ltr'}>
       <aside className="side">
-        <div className="sbrand"><span className="smark">▣</span><div><div className="sname">Invutory</div><div className="ssub">Shop register</div></div></div>
+        <div className="sbrand"><span className="smark">▣</span><div><div className="sname">Stockory</div><div className="ssub">Shop register</div></div></div>
         {nav.map(g => (
           <div key={g.sec} className="sgrp">
             <div className="ssec">{ur ? (g.secUr || g.sec) : g.sec}</div>
@@ -184,7 +184,7 @@ export default function App() {
             <b>{store.settings.shopName || 'Shop'}</b>
             <span className="opd">Register open</span>
             {store.settings.syncAuto !== false && (
-              <span className="opd" title="Auto-sync on — updates move between Invutory apps on this WiFi/LAN automatically"
+              <span className="opd" title="Auto-sync on — updates move between Stockory apps on this WiFi/LAN automatically"
                 style={Date.now() - syncFlash < 8000 ? { background: '#bbf7d0', color: '#166534' } : { background: '#e0f2fe', color: '#0369a1' }}>
                 ↻ Live sync
               </span>)}
@@ -201,10 +201,10 @@ export default function App() {
 
         {firstRun && (
           <div className="welcome">
-            <h1>Welcome to Invutory</h1>
+            <h1>Welcome to Stockory</h1>
             <p>A sample shop (Al-Noor General Store) with 16 items, today's sales and stock movements is loaded so you can try everything — ring up a sale, print the receipt, check the day book.</p>
             <p className="muted" style={{ fontSize: 12.5, lineHeight: 1.6, maxWidth: 560 }}>
-              <b>Your consent & privacy:</b> by using Invutory you agree that shop records (items, stock,
+              <b>Your consent & privacy:</b> by using Stockory you agree that shop records (items, stock,
               sales and expenses) are entered and stored <b>only on this computer</b> — encrypted at rest.
               Nothing is uploaded anywhere; the app makes no internet connection, and LAN sharing stays
               off unless you turn it on. You are responsible for backups and for the lawful handling of
@@ -229,7 +229,7 @@ export default function App() {
           {tab === 'reports' && <ReportsPanel store={store} />}
           {tab === 'settings' && <SettingsPanel store={store} update={update} setStore={setStore} />}
         </main>
-        <footer className="foot">Invutory v{version} — offline stock &amp; sales register. Data is encrypted on this computer.</footer>
+        <footer className="foot">Stockory v{version} — offline stock &amp; sales register. Data is encrypted on this computer.</footer>
       </div>
     </div>
   );

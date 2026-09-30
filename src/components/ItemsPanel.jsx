@@ -26,7 +26,7 @@ export default function ItemsPanel({ store, update }) {
     </tr>
   );
 
-  const exportItems = () => window.api.export.text({ text: itemsCsv(store), suggestedName: 'invutory-items.csv' });
+  const exportItems = () => window.api.export.text({ text: itemsCsv(store), suggestedName: 'stockory-items.csv' });
   // Printable Code39 label sheet (A4 grid) for items with a barcode or SKU.
   const printLabels = () => {
     const list = (cat ? items.filter(i => i.category === cat) : items).filter(i => i.barcode || i.sku);

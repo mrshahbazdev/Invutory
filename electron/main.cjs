@@ -82,7 +82,7 @@ function createWindow() {
     minHeight: 700,
     autoHideMenuBar: true,
     show: false,
-    title: 'Invutory',
+    title: 'Stockory',
     backgroundColor: '#f1f5f9',
     webPreferences: {
       preload: path.join(__dirname, 'preload.cjs'),

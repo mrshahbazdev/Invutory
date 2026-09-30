@@ -1,6 +1,6 @@
 {
- "name": "invutory",
- "productName": "Invutory",
+ "name": "stockory",
+ "productName": "Stockory",
  "description": "Offline stock and sales register for small shops — items, stock in/out, low-stock alerts, bilingual receipts, day book. No account, no internet.",
  "author": {
   "name": "Muhammad Shahbaz",
@@ -19,8 +19,8 @@
   "dist:win": "npm run build && electron-builder --win --x64"
  },
  "build": {
-  "appId": "com.shahbaz.invutory",
-  "productName": "Invutory",
+  "appId": "com.shahbaz.stockory",
+  "productName": "Stockory",
   "copyright": "Copyright © 2026 Muhammad Shahbaz",
   "asar": true,
   "asarUnpack": [
@@ -58,8 +58,8 @@
    "icon": "build/icon.ico"
   },
   "appx": {
-   "applicationId": "Invutory",
-   "displayName": "Invutory",
+   "applicationId": "Stockory",
+   "displayName": "Stockory",
    "identityName": "FROM_PARTNER_CENTER",
    "publisher": "CN=FROM_PARTNER_CENTER",
    "publisherDisplayName": "Muhammad Shahbaz",
