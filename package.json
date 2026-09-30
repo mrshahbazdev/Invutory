@@ -60,8 +60,8 @@
   "appx": {
    "applicationId": "Shopane",
    "displayName": "Shopane",
-   "identityName": "FROM_PARTNER_CENTER",
-   "publisher": "CN=FROM_PARTNER_CENTER",
+   "identityName": "MuhammadShahbaz.Binsorys",
+   "publisher": "CN=82C2C857-730F-4239-B80D-4F1C7E03E8B4",
    "publisherDisplayName": "Muhammad Shahbaz",
    "backgroundColor": "#1d4ed8",
    "addAutoLaunchExtension": false,
