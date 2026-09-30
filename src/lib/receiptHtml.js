@@ -50,7 +50,7 @@ td { padding: 1.5px 0; vertical-align: top; }
   ${change < 0 ? `<div class="meta"><span>Balance due / بقایا</span><span>${fmt(-change, cur)}</span></div>` : ''}
   <div class="hr"></div>
   <div class="foot rtl">${esc(st.receiptFooter || '')}</div>
-  <div class="foot" style="font-size:8.5px;color:#666">Stockory</div>
+  <div class="foot" style="font-size:8.5px;color:#666">Shopane</div>
 </body></html>`;
 }
 

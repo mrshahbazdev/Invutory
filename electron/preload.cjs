@@ -21,7 +21,7 @@ contextBridge.exposeInMainWorld('api', {
   sync: {
     publish: (doc) => ipcRenderer.invoke('sync:publish', { doc }),
     status: () => ipcRenderer.invoke('sync:status'),
-    onApply: (cb) => ipcRenderer.on('stockory:sync-apply', (_e, doc) => cb(doc))
+    onApply: (cb) => ipcRenderer.on('shopane:sync-apply', (_e, doc) => cb(doc))
   },
   auth: {
     verifyPin: (userId, candidate) => ipcRenderer.invoke('auth:verifyUserPin', { userId, candidate }).then(r => r.ok)

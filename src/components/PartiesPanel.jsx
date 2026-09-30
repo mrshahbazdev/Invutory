@@ -52,7 +52,7 @@ export default function PartiesPanel({ store, update }) {
       <div><b>${esc(selected.name)}</b> ${esc(selected.phone || '')}</div>
       <div>Balance: <b>${fmt(khataBalance(store, side, sel), cur)}</b></div>
       <table><thead><tr><th>Date</th><th>Entry</th><th style="text-align:right">Udhaar</th><th style="text-align:right">Paid</th></tr></thead><tbody>${rows}</tbody></table>
-      <div class="foot" style="margin-top:8px;font-size:9px;color:#666">Stockory — khata statement</div>
+      <div class="foot" style="margin-top:8px;font-size:9px;color:#666">Shopane — khata statement</div>
     </body></html>` });
   };
 

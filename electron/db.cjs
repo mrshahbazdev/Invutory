@@ -7,14 +7,14 @@ const { readDoc, hashPins } = require('./ipc/doc-io.cjs');
 
 /**
  * SQLite document store (better-sqlite3-multiple-ciphers → SQLCipher).
- * - stockory.db lives in userData, encrypted with a random key (the key itself
+ * - shopane.db lives in userData, encrypted with a random key (the key itself
  *   is wrapped by OS safeStorage / DPAPI and kept in db.key next to the
  *   database).
  * - WAL + foreign keys on; every write is record-level inside one transaction.
  * - mergeSave diffs the client's doc against the doc that client last loaded
  *   (tracked by rev) and applies ONLY the rows that client changed — so two
  *   tills/counters on different PCs no longer overwrite each other.
- * - Never put stockory.db on a network share: SMB locking corrupts SQLite.
+ * - Never put shopane.db on a network share: SMB locking corrupts SQLite.
  *   The multi-PC path stays host + HTTP.
  */
 
@@ -65,7 +65,7 @@ function openDb() {
     throw new Error('OS encryption unavailable — cannot open encrypted store database');
   }
   const dir = app.getPath('userData');
-  db = new Database(path.join(dir, 'stockory.db'));
+  db = new Database(path.join(dir, 'shopane.db'));
   db.pragma(`key='${keyForDb()}'`);
   db.exec(TABLES);
   revCounter = Number((db.prepare(`SELECT v FROM meta WHERE k='rev'`).get() || {}).v || 0);
@@ -73,7 +73,7 @@ function openDb() {
   return db;
 }
 
-// ---- migration: one-shot import of the legacy stockory.json ----
+// ---- migration: one-shot import of the legacy shopane.json ----
 function migrateFromJson() {
   const done = (db.prepare(`SELECT v FROM meta WHERE k='migrated'`).get() || {}).v;
   if (done) return;
@@ -85,8 +85,8 @@ function migrateFromJson() {
     if (doc.updatedAt) db.prepare(`INSERT OR REPLACE INTO meta (k, v) VALUES ('updatedAt', ?)`).run(String(doc.updatedAt));
     try {
       fs.renameSync(
-        path.join(app.getPath('userData'), 'stockory.json'),
-        path.join(app.getPath('userData'), 'stockory.json.migrated')
+        path.join(app.getPath('userData'), 'shopane.json'),
+        path.join(app.getPath('userData'), 'shopane.json.migrated')
       );
     } catch {}
   }

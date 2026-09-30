@@ -1,6 +1,6 @@
 {
- "name": "stockory",
- "productName": "Stockory",
+ "name": "shopane",
+ "productName": "Shopane",
  "description": "Offline stock and sales register for small shops — items, stock in/out, low-stock alerts, bilingual receipts, day book. No account, no internet.",
  "author": {
   "name": "Muhammad Shahbaz",
@@ -19,8 +19,8 @@
   "dist:win": "npm run build && electron-builder --win --x64"
  },
  "build": {
-  "appId": "com.shahbaz.stockory",
-  "productName": "Stockory",
+  "appId": "com.shahbaz.shopane",
+  "productName": "Shopane",
   "copyright": "Copyright © 2026 Muhammad Shahbaz",
   "asar": true,
   "asarUnpack": [
@@ -58,8 +58,8 @@
    "icon": "build/icon.ico"
   },
   "appx": {
-   "applicationId": "Stockory",
-   "displayName": "Stockory",
+   "applicationId": "Shopane",
+   "displayName": "Shopane",
    "identityName": "FROM_PARTNER_CENTER",
    "publisher": "CN=FROM_PARTNER_CENTER",
    "publisherDisplayName": "Muhammad Shahbaz",

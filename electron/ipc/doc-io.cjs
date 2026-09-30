@@ -4,14 +4,14 @@ const crypto = require('crypto');
 const { app, safeStorage } = require('electron');
 
 // Encrypted-at-rest document IO. The store file is safeStorage-encrypted
-// (DPAPI on Windows, Keychain on macOS); older plaintext stockory.json files
+// (DPAPI on Windows, Keychain on macOS); older plaintext shopane.json files
 // are migrated transparently on first load. If encryption is unavailable
 // (headless Linux), we still write — marked unencrypted.
 const ENC_TAG = 'INVUTORY1:';
 const ENC_TAG_OLD = 'LEGACY1:';
 
-function docPath() { return path.join(app.getPath('userData'), 'stockory.json'); }
-function docPathOld() { return path.join(app.getPath('userData'), 'stockory-legacy.json'); }
+function docPath() { return path.join(app.getPath('userData'), 'shopane.json'); }
+function docPathOld() { return path.join(app.getPath('userData'), 'shopane-legacy.json'); }
 
 function atomicWrite(file, text) {
   const tmp = `${file}.${crypto.randomBytes(6).toString('hex')}.tmp`;

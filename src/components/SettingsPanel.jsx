@@ -20,7 +20,7 @@ function LanConnect({ st, mut }) {
           setInfo({ ...info, enabled: r.enabled, error: r.error });
           refresh();
         }} />
-        Share Stockory on this WiFi — a second counter/till opens it in a browser; all data saves on THIS computer
+        Share Shopane on this WiFi — a second counter/till opens it in a browser; all data saves on THIS computer
       </label>
       {info.error && <div style={{ color: '#dc2626', marginTop: 6 }}>⚠ Could not start sharing: {info.error}</div>}
       {info.enabled && (<>
@@ -99,14 +99,14 @@ export default function SettingsPanel({ store, update, setStore }) {
         <button className="btn small ghost" onClick={() => mut(x => { x.users = x.users || []; x.users.push({ id: 'u' + Date.now(), name: 'Counter staff', role: 'counter', pin: '0000' }); })}>+ User</button>
       </div>
 
-      <h2 className="ptitle">Local connection — use Stockory on a second PC</h2>
+      <h2 className="ptitle">Local connection — use Shopane on a second PC</h2>
       <LanConnect st={st} mut={mut} />
 
       <h2 className="ptitle">Backups &amp; sync</h2>
       <div className="frow" style={{ marginBottom: 8 }}>
         <label className="lbl" style={{ flex: 1 }}>Backup folder (USB/cloud) — an encrypted copy is written here daily
-          <input className="in" value={st.backupFolder || ''} placeholder="e.g. D:\Stockory Backups" onChange={e => mut(x => x.backupFolder = e.target.value)} /></label>
-        <label className="lbl" style={{ flex: 1 }}>Sync folder — app writes <code>stockory-sync.json</code> here; same path on every PC keeps them in sync
+          <input className="in" value={st.backupFolder || ''} placeholder="e.g. D:\Shopane Backups" onChange={e => mut(x => x.backupFolder = e.target.value)} /></label>
+        <label className="lbl" style={{ flex: 1 }}>Sync folder — app writes <code>shopane-sync.json</code> here; same path on every PC keeps them in sync
           <input className="in" value={st.syncFolder || ''} placeholder="e.g. \\COUNTER2\shared" onChange={e => mut(x => x.syncFolder = e.target.value)} /></label>
       </div>
       <label style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 14, fontSize: 13 }}>

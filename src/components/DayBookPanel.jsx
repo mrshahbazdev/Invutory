@@ -35,7 +35,7 @@ export default function DayBookPanel({ store, update }) {
       <div class="meta"><b>Expected in drawer</b><span><b>${fmt(z.expectedCash, cur)}</b></span></div>
       <div class="meta"><b>Counted</b><span><b>${fmt(z.countedCash, cur)}</b></span></div>
       <div class="meta"><b>Variance</b><span><b>${fmt(z.variance, cur)}</b></span></div>
-      <div class="hr"></div><div style="text-align:center;font-size:9px">Stockory Z-report · ${esc(z.at)}</div></body></html>` });
+      <div class="hr"></div><div style="text-align:center;font-size:9px">Shopane Z-report · ${esc(z.at)}</div></body></html>` });
     setClosing(false);
   };
 
@@ -53,7 +53,7 @@ export default function DayBookPanel({ store, update }) {
     const srows = d.sales.map(s => `<tr><td>#${s.number}</td><td>${esc((s.at || '').slice(11, 16))}</td><td>${esc((s.lines || []).map(l => `${l.name} x${l.qty}`).join(', '))}</td><td style="text-align:right">${num(s.total).toLocaleString()}</td><td>${esc(s.method)}</td></tr>`).join('');
     const erows = d.expenses.map(e => `<tr><td>${esc((e.at || '').slice(11, 16))}</td><td>${esc(e.label)}</td><td style="text-align:right">${num(e.amount).toLocaleString()}</td></tr>`).join('');
     window.api.export.print({ html: `<!doctype html><html><head><style>@page{size:A4;margin:14mm}body{font:10.5pt 'Segoe UI',sans-serif}table{width:100%;border-collapse:collapse;margin-top:6px}td,th{border:1px solid #e2e8f0;padding:4px 7px;text-align:left}th{background:#0c1c33;color:#fff}h1{font-size:16pt;margin:0}h2{font-size:12pt;margin:14px 0 2px}</style></head><body>
-      <h1>${esc(store.settings.shopName || 'Stockory')} — Day book ${esc(date)}</h1>
+      <h1>${esc(store.settings.shopName || 'Shopane')} — Day book ${esc(date)}</h1>
       <div>Sales ${fmt(d.gross, cur)} · Collected ${fmt(d.paid, cur)} · Expenses ${fmt(d.exp, cur)} · <b>Net ${fmt(d.net, cur)}</b></div>
       <h2>Sales (${d.sales.length})</h2><table><thead><tr><th>#</th><th>Time</th><th>Items</th><th>Total</th><th>Method</th></tr></thead><tbody>${srows}</tbody></table>
       <h2>Expenses (${d.expenses.length})</h2><table><thead><tr><th>Time</th><th>Label</th><th>Amount</th></tr></thead><tbody>${erows}</tbody></table>

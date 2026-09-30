@@ -10,10 +10,10 @@ const { serveDoc, mergeSave, loadDoc, listRows, getRow, putRow, patchRow, delete
 
 function notifyRenderer() {
   const w = BrowserWindow.getAllWindows()[0];
-  if (w) w.webContents.send('stockory:sync-apply', loadDoc());
+  if (w) w.webContents.send('shopane:sync-apply', loadDoc());
 }
 
-// LAN host mode (OPT-IN): when enabled in Settings, this PC serves Stockory to
+// LAN host mode (OPT-IN): when enabled in Settings, this PC serves Shopane to
 // other devices on the same WiFi. Every /api call requires the access code
 // shown on this PC — without it the shop database stays private.
 const HOST_PORT = 47071;
@@ -56,11 +56,11 @@ function startServer() {
     const parsed = new URL(req.url || '/', 'http://x');
     const url = parsed.pathname;
     try {
-      if (url === '/api/ping') { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end('{"ok":true,"app":"stockory"}'); return; }
+      if (url === '/api/ping') { res.writeHead(200, { 'Content-Type': 'application/json' }); res.end('{"ok":true,"app":"shopane"}'); return; }
 
       if (url.startsWith('/api/')) {
         // Access code accepted via header only — never the URL (browser history).
-        const tok = req.headers['x-stockory-token'] || req.headers['x-stockory-token'] || '';
+        const tok = req.headers['x-shopane-token'] || req.headers['x-shopane-token'] || '';
         if (!codeEq(tok, lanCode())) { res.writeHead(401, { 'Content-Type': 'application/json' }); res.end('{"error":"invalid access code"}'); return; }
 
         if (url === '/api/store') {

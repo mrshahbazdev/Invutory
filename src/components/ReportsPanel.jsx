@@ -50,7 +50,7 @@ export default function ReportsPanel({ store }) {
         <label className="lbl" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>From <input className="in" type="date" value={from} onChange={e => setFrom(e.target.value)} /></label>
         <label className="lbl" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>To <input className="in" type="date" value={to} onChange={e => setTo(e.target.value)} /></label>
         <span className="spacer" />
-        <button className="btn ghost small" onClick={() => window.api.export.text({ text: salesCsv({ sales }), suggestedName: `stockory-sales-${from}_${to}.csv` })}>Export CSV</button>
+        <button className="btn ghost small" onClick={() => window.api.export.text({ text: salesCsv({ sales }), suggestedName: `shopane-sales-${from}_${to}.csv` })}>Export CSV</button>
       </div>
 
       <div className="cards" style={{ gridTemplateColumns: 'repeat(4, 1fr)' }}>
