@@ -7,6 +7,9 @@ import StockPanel from './components/StockPanel.jsx';
 import SettingsPanel from './components/SettingsPanel.jsx';
 import DayBookPanel from './components/DayBookPanel.jsx';
 import ReportsPanel from './components/ReportsPanel.jsx';
+import PartiesPanel from './components/PartiesPanel.jsx';
+import PurchasesPanel from './components/PurchasesPanel.jsx';
+import ReturnsPanel from './components/ReturnsPanel.jsx';
 import PinGate from './components/PinGate.jsx';
 import { installWebApi } from './lib/webapi.js';
 import { itemsCsv } from './lib/csv.js';
@@ -19,11 +22,14 @@ const NAV = [
   { sec: 'Counter', secUr: 'کاؤنٹر', items: [
     { id: 'sale', label: 'New sale', ur: 'فروخت', glyph: '🧾' },
     { id: 'dash', label: 'Dashboard', ur: 'ڈیش بورڈ', glyph: '⌂' },
-    { id: 'daybook', label: 'Day book', ur: 'روزنامچہ', glyph: '▤' }
+    { id: 'daybook', label: 'Day book', ur: 'روزنامچہ', glyph: '▤' },
+    { id: 'returns', label: 'Returns', ur: 'واپسی', glyph: '↩' }
   ]},
   { sec: 'Store', secUr: 'اسٹور', items: [
     { id: 'items', label: 'Items', ur: 'اشیاء', glyph: '▦' },
     { id: 'stock', label: 'Stock in/out', ur: 'اسٹاک', glyph: '⇅' },
+    { id: 'purchases', label: 'Purchases', ur: 'خریداری', glyph: '⤓' },
+    { id: 'parties', label: 'Khata / parties', ur: 'کھاتہ', glyph: '📒' },
     { id: 'reports', label: 'Reports', ur: 'رپورٹ', glyph: '☷' },
     { id: 'settings', label: 'Settings', ur: 'ترتیبات', glyph: '⚙' }
   ]}
@@ -52,7 +58,7 @@ export default function App() {
       if (hasData) {
         const base = emptyStore();
         Object.keys(base).forEach(k => { if (doc[k] === undefined) doc[k] = base[k]; });
-        ['stockMoves', 'expenses', 'auditLog'].forEach(k => { if (!Array.isArray(doc[k])) doc[k] = []; });
+        ['stockMoves', 'expenses', 'auditLog', 'customers', 'suppliers', 'khata', 'purchases', 'returns', 'zreports'].forEach(k => { if (!Array.isArray(doc[k])) doc[k] = []; });
         doc.settings = { ...emptyStore().settings, ...(doc.settings || {}) };
         setStore(doc);
       } else setStore(sampleStore());
@@ -217,6 +223,9 @@ export default function App() {
           {tab === 'items' && <ItemsPanel store={store} update={update} />}
           {tab === 'stock' && <StockPanel store={store} update={update} />}
           {tab === 'daybook' && <DayBookPanel store={store} update={update} />}
+          {tab === 'returns' && <ReturnsPanel store={store} update={update} user={user} />}
+          {tab === 'parties' && <PartiesPanel store={store} update={update} />}
+          {tab === 'purchases' && <PurchasesPanel store={store} update={update} user={user} />}
           {tab === 'reports' && <ReportsPanel store={store} />}
           {tab === 'settings' && <SettingsPanel store={store} update={update} setStore={setStore} />}
         </main>

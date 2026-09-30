@@ -1,13 +1,43 @@
 import { useState } from 'react';
-import { fmt, num, uid, dayTotals } from '../lib/model.js';
+import { fmt, num, uid, dayTotals, expectedCash } from '../lib/model.js';
 import { receiptHtml } from '../lib/receiptHtml.js';
 
 export default function DayBookPanel({ store, update }) {
   const [date, setDate] = useState(new Date().toISOString().slice(0, 10));
   const [label, setLabel] = useState('');
   const [amount, setAmount] = useState('');
+  const [closing, setClosing] = useState(false);
+  const [opening, setOpening] = useState('');
+  const [counted, setCounted] = useState('');
   const d = dayTotals(store, date);
   const cur = store.settings.currency;
+  const expected = expectedCash(store, date, opening);
+  const zForDay = (store.zreports || []).find(z => z.day === date);
+
+  const closeRegister = () => {
+    const z = {
+      id: uid('z'), day: date, at: new Date().toISOString().slice(0, 16),
+      openingCash: num(opening), expectedCash: expected, countedCash: num(counted),
+      variance: num(counted) - expected,
+      gross: d.gross, salesCount: d.sales.length, refunds: d.refunds, expenses: d.exp,
+      user: '', note: ''
+    };
+    update(s => { s.zreports = (s.zreports || []).filter(x => x.day !== date); s.zreports.push(z); }, `Z-report ${date}`);
+    const esc = x => String(x ?? '').replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+    window.api.export.print({ html: `<!doctype html><html><head><style>@page{size:72mm auto;margin:4mm}body{font-family:'Segoe UI',sans-serif;font-size:11px;width:64mm}h1{font-size:14px;text-align:center;margin:0}.hr{border-top:1px dashed #000;margin:5px 0}.meta{display:flex;justify-content:space-between}</style></head><body>
+      <h1>${esc(store.settings.shopName || 'Shop')}</h1><div style="text-align:center">Register close — ${esc(date)}</div><div class="hr"></div>
+      <div class="meta"><span>Receipts</span><span>${z.salesCount}</span></div>
+      <div class="meta"><span>Gross sales</span><span>${fmt(z.gross, cur)}</span></div>
+      <div class="meta"><span>Refunds</span><span>-${fmt(z.refunds, cur)}</span></div>
+      <div class="meta"><span>Expenses</span><span>-${fmt(z.expenses, cur)}</span></div>
+      <div class="hr"></div>
+      <div class="meta"><span>Opening cash</span><span>${fmt(z.openingCash, cur)}</span></div>
+      <div class="meta"><b>Expected in drawer</b><span><b>${fmt(z.expectedCash, cur)}</b></span></div>
+      <div class="meta"><b>Counted</b><span><b>${fmt(z.countedCash, cur)}</b></span></div>
+      <div class="meta"><b>Variance</b><span><b>${fmt(z.variance, cur)}</b></span></div>
+      <div class="hr"></div><div style="text-align:center;font-size:9px">Invutory Z-report · ${esc(z.at)}</div></body></html>` });
+    setClosing(false);
+  };
 
   const addExpense = () => {
     if (!label.trim() || !num(amount)) return;
@@ -36,12 +66,32 @@ export default function DayBookPanel({ store, update }) {
         <input className="in" type="date" value={date} onChange={e => setDate(e.target.value)} />
         <button className="btn ghost small" onClick={() => setDate(new Date().toISOString().slice(0, 10))}>Today</button>
         <span className="spacer" />
+        {zForDay
+          ? <span className="chip" title={`Closed ${zForDay.at}`}>✔ Closed — variance {fmt(zForDay.variance, cur)}</span>
+          : <button className="btn ghost small" onClick={() => setClosing(c => !c)}>Close register (Z)</button>}
         <button className="btn ghost small" onClick={printDay}>Print day book</button>
       </div>
+
+      {closing && !zForDay && (
+        <div className="form" style={{ marginBottom: 14 }}>
+          <h2 className="ptitle" style={{ marginTop: 0 }}>Register close — {date}</h2>
+          <div className="frow">
+            <label className="lbl" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>Opening cash
+              <input className="in num" style={{ width: 100 }} type="number" min="0" value={opening} onChange={e => setOpening(e.target.value)} /></label>
+            <span>Expected in drawer: <b>{fmt(expected, cur)}</b> <span className="muted">(opening + cash sales − refunds − expenses)</span></span>
+            <label className="lbl" style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>Counted
+              <input className="in num" style={{ width: 100 }} type="number" min="0" value={counted} onChange={e => setCounted(e.target.value)} /></label>
+            {counted !== '' && <b style={{ color: num(counted) - expected >= 0 ? 'var(--ok)' : 'var(--danger)' }}>{num(counted) - expected >= 0 ? 'Over' : 'Short'} {fmt(Math.abs(num(counted) - expected), cur)}</b>}
+            <button className="btn small" disabled={counted === ''} onClick={closeRegister}>Save + print Z-report</button>
+          </div>
+        </div>
+      )}
 
       <div className="cards">
         <div className="card"><div className="clabel">Sales</div><div className="cval">{fmt(d.gross, cur)}</div><div className="csub">{d.sales.length} receipts</div></div>
         <div className="card"><div className="clabel">Expenses</div><div className="cval" style={{ color: 'var(--danger)' }}>{fmt(d.exp, cur)}</div></div>
+        <div className="card"><div className="clabel">Profit (sale − cost)</div><div className="cval" style={{ color: 'var(--ok)' }}>{fmt(d.profit, cur)}</div></div>
+        {d.refunds > 0 && <div className="card"><div className="clabel">Refunds</div><div className="cval" style={{ color: 'var(--danger)' }}>{fmt(d.refunds, cur)}</div><div className="csub">{d.returns.length} returns</div></div>}
         <div className="card"><div className="clabel">Net (paid − expenses)</div><div className="cval" style={{ color: d.net >= 0 ? 'var(--ok)' : 'var(--danger)' }}>{fmt(d.net, cur)}</div></div>
       </div>
 

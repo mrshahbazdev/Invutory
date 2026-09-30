@@ -12,7 +12,7 @@ export function receiptHtml(sale, st) {
       <td class="nm">${esc(useUrdu && l.urduName ? l.urduName : l.name)}${useUrdu && l.urduName ? `<div class="en">${esc(l.name)}</div>` : ''}</td>
       <td class="q">${num(l.qty)}</td>
       <td class="p">${num(l.price).toLocaleString()}</td>
-      <td class="t">${(num(l.qty) * num(l.price)).toLocaleString()}</td>
+      <td class="t">${(num(l.qty) * num(l.price) - num(l.discount)).toLocaleString()}${num(l.discount) ? `<div class="en">-${num(l.discount).toLocaleString()} disc</div>` : ''}</td>
     </tr>`).join('');
   const total = saleLinesOf(sale);
   const change = num(sale.paid) - total;
@@ -56,6 +56,6 @@ td { padding: 1.5px 0; vertical-align: top; }
 
 function saleLinesOf(sale) {
   let t = 0;
-  for (const l of sale.lines || []) t += num(l.qty) * num(l.price);
+  for (const l of sale.lines || []) t += num(l.qty) * num(l.price) - num(l.discount);
   return t - num(sale.discount);
 }

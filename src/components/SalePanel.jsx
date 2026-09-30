@@ -1,5 +1,5 @@
 import { useMemo, useRef, useState } from 'react';
-import { fmt, num, uid, nextSaleNumber, saleLines } from '../lib/model.js';
+import { fmt, num, uid, nextSaleNumber, saleLines, findCustomer } from '../lib/model.js';
 import { receiptHtml } from '../lib/receiptHtml.js';
 
 // Point-of-sale cart: pick items (name/SKU search), adjust qty/price, take
@@ -18,14 +18,14 @@ export default function SalePanel({ store, update, user }) {
   const matches = useMemo(() => {
     if (!q.trim()) return [];
     const n = q.trim().toLowerCase();
-    return items.filter(i => `${i.sku} ${i.name} ${i.urduName || ''}`.toLowerCase().includes(n)).slice(0, 8);
+    return items.filter(i => `${i.sku} ${i.barcode || ''} ${i.name} ${i.urduName || ''}`.toLowerCase().includes(n)).slice(0, 8);
   }, [q, items]);
 
   const add = it => {
     setCart(c => {
       const ex = c.find(l => l.itemId === it.id);
       if (ex) return c.map(l => l.itemId === it.id ? { ...l, qty: l.qty + 1 } : l);
-      return [...c, { itemId: it.id, name: it.name, urduName: it.urduName, qty: 1, price: num(it.price), cost: num(it.cost), unit: it.unit }];
+      return [...c, { itemId: it.id, name: it.name, urduName: it.urduName, qty: 1, price: num(it.price), cost: num(it.cost), unit: it.unit, discount: 0 }];
     });
     setQ(''); qRef.current?.focus();
   };
@@ -34,7 +34,7 @@ export default function SalePanel({ store, update, user }) {
   const onSearchKey = e => {
     if (e.key !== 'Enter') return;
     const n = q.trim().toLowerCase();
-    const exact = items.find(i => (i.sku || '').toLowerCase() === n) || matches[0];
+    const exact = items.find(i => (i.sku || '').toLowerCase() === n || (i.barcode || '').toLowerCase() === n) || matches[0];
     if (exact) add(exact);
   };
 
@@ -50,12 +50,29 @@ export default function SalePanel({ store, update, user }) {
     const sale = {
       id: uid('s'), number: nextSaleNumber(store),
       at: new Date().toISOString().slice(0, 16),
-      lines: cart.map(l => ({ itemId: l.itemId, name: l.name, urduName: l.urduName, qty: num(l.qty), price: num(l.price), cost: num(l.cost) })),
+      lines: cart.map(l => ({ itemId: l.itemId, name: l.name, urduName: l.urduName, qty: num(l.qty), price: num(l.price), cost: num(l.cost), discount: num(l.discount) })),
       discount: num(discount), total, paid: num(paid) || total, method, customer: customer.trim(),
       note: '', user: (user && user.name) || 'app'
     };
+    // Credit sale: unresolved balance lands on the customer's khata.
+    const shortfall = Math.max(0, sale.total - num(sale.paid));
+    if ((sale.method === 'credit' || shortfall > 0) && shortfall > 0) {
+      let cust = findCustomer(store, sale.customer);
+      if (!cust && sale.customer) cust = { id: uid('c'), name: sale.customer, phone: '', note: '', _new: true };
+      if (cust) {
+        sale.customerId = cust.id;
+        sale.customer = cust.name;
+        sale._khata = { partyId: cust.id, partyName: cust.name, amount: shortfall, _newCustomer: cust._new ? cust : null };
+      }
+    }
     update(s => {
       s.sales.push(sale);
+      if (sale._khata) {
+        if (sale._khata._newCustomer) { s.customers = s.customers || []; s.customers.push({ id: sale._khata._newCustomer.id, name: sale._khata._newCustomer.name, phone: '', note: '' }); }
+        s.khata = s.khata || [];
+        s.khata.push({ id: uid('k'), partyType: 'customer', partyId: sale._khata.partyId, partyName: sale._khata.partyName, at: sale.at, amount: sale._khata.amount, kind: 'sale', refId: sale.id, note: `Sale #${sale.number}` });
+        delete sale._khata;
+      }
       const at = sale.at;
       for (const l of cart) {
         const it = s.items.find(i => i.id === l.itemId);
@@ -93,7 +110,7 @@ export default function SalePanel({ store, update, user }) {
         </div>
 
         <table className="grid">
-          <thead><tr><th style={{ width: '42%' }}>Item</th><th className="num">Qty</th><th className="num">Price</th><th className="num">Amount</th><th className="num">In stock</th><th></th></tr></thead>
+          <thead><tr><th style={{ width: '38%' }}>Item</th><th className="num">Qty</th><th className="num">Price</th><th className="num">Disc</th><th className="num">Amount</th><th className="num">In stock</th><th></th></tr></thead>
           <tbody>
             {cart.map((l, i) => (
               <tr key={l.itemId}>
@@ -106,12 +123,14 @@ export default function SalePanel({ store, update, user }) {
                 </td>
                 <td className="num"><input className="in num" style={{ width: 78 }} type="number" min="0" value={l.price}
                   onChange={e => setCart(c => c.map((x, ix) => ix === i ? { ...x, price: num(e.target.value) } : x))} /></td>
-                <td className="num"><b>{fmt(num(l.qty) * num(l.price), store.settings.currency)}</b></td>
+                <td className="num"><input className="in num" style={{ width: 62 }} type="number" min="0" value={l.discount || 0}
+                  onChange={e => setCart(c => c.map((x, ix) => ix === i ? { ...x, discount: num(e.target.value) } : x))} /></td>
+                <td className="num"><b>{fmt(num(l.qty) * num(l.price) - num(l.discount), store.settings.currency)}</b></td>
                 <td className="num muted" style={{ color: l.qty > stockOf(l.itemId) ? 'var(--danger)' : undefined }}>{stockOf(l.itemId)} {l.unit}</td>
                 <td><button className="icon" onClick={() => setCart(c => c.filter((_, ix) => ix !== i))}>✕</button></td>
               </tr>
             ))}
-            {!cart.length && <tr><td colSpan="6" className="muted" style={{ padding: 26, textAlign: 'center' }}>Cart is empty — search or scan an item above.</td></tr>}
+            {!cart.length && <tr><td colSpan="7" className="muted" style={{ padding: 26, textAlign: 'center' }}>Cart is empty — search or scan an item above.</td></tr>}
           </tbody>
         </table>
 
